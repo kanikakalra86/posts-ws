@@ -1,0 +1,52 @@
+#%RAML 1.0
+title: Posts
+
+types:
+  Post: !include datatypes/Post.raml
+  
+
+/posts:
+  get:
+    displayName: Get Posts
+    description: Get posts from all users
+    responses:
+      200:
+        description: Success
+        body:
+          application/json:
+            type:  Post[]
+            examples: 
+             output: !include example/userBlogPosts.raml
+              
+      400:
+        body:
+          application/json:
+            example:
+               message: Error in fetching Posts
+  /{id}:
+    get:
+      displayName: Get posts for unique id
+      description: Get all posts from particular id 
+      responses:
+        200:
+          description: Success
+          body:
+            application/json:
+              type: Post
+              examples: 
+               output: !include example/userBlogPost.raml
+                
+        400:
+          body:
+            application/json:
+              example:
+                message: Could not post corresponding to particular ID.
+                
+                
+        
+    
+              
+              
+                
+              
+              

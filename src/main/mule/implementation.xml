@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="get:\posts\(id):posts-API-config" doc:id="3ebaf072-150a-4cf2-9d51-38294ea9d79e" >
+		<set-variable value="#[message.attributes.uriParams.id]" doc:name="Id" doc:id="eef87e8a-f25b-4ab9-a0a2-ed9b3ac74333" variableName="Id"/>
+		<logger level="INFO" doc:name="Logger" doc:id="31c0c396-a2a1-4c0b-aa7e-98b62c16e922" message="#[vars.Id]"/>
+		<http:request method="GET" doc:name="getSpecificPost" doc:id="cb41ff4c-2fa0-4de7-abda-11f54a5fd284" config-ref="HTTP_Request_configuration" path="/posts/{id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"id" : vars.Id
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="1fa2becc-d282-4f20-914e-08be039ac901" />
+		<error-handler>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cb83d2ab-7a5b-4cfd-8b7c-70e214fe390a" type="HTTP:BAD_REQUEST, HTTP:NOT_FOUND">
+				<logger level="ERROR" doc:name="Logger" doc:id="4bb8b858-715f-45bd-a87c-99a2dcdf0e00" message="#[payload]"/>
+				<logger level="ERROR" doc:name="Logger" doc:id="4dc91244-5881-4070-9a9a-5dbcb9c683b4" message="#[error.description]"/>
+				<ee:transform doc:name="Transform Message" doc:id="139a29a8-20d5-47f9-8dc2-a7b6ae2bb48a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.description
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="httpStatus" doc:id="0ce07bc8-cedf-4f87-8188-be5371fecc1d" variableName="httpStatus"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get:\posts:posts-API-config" doc:id="973438da-66d2-4f85-890d-99479a8a3444" >
+		<http:request method="GET" doc:name="getAllPosts" doc:id="039b53d0-6934-4304-8bb5-d84a765225bf" config-ref="HTTP_Request_configuration" path="/posts"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dc04b18a-af24-406a-b815-778bba5ca834" />
+	</flow>
+</mule>
