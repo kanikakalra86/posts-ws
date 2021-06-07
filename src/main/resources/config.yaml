@@ -1,0 +1,11 @@
+
+http:
+ port: "8081"
+ 
+request: 
+ host: "jsonplaceholder.typicode.com"
+ port: "80"
+ basepath: "/"
+ protocol: "HTTP"
+ connection timeout: "3000"
+ response timeout: "3000"
